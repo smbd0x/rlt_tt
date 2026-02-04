@@ -4,11 +4,11 @@
 
 1
 
-    git clone https://github.com/smbd0x/luna_tt
+    git clone https://github.com/smbd0x/rlt_tt
 
 2
 
-    cd luna_tt
+    cd rlt_tt
 
 3 Создать .env файл, пример (OPENAI_API_KEY берется с сайта https://proxyapi.ru/):
 

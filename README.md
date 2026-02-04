@@ -44,3 +44,33 @@
 
 ## О боте ##
 Промпт можно найти в файле [llm/parser](https://github.com/smbd0x/rlt_tt/blob/master/llm/parser.py)
+
+LLM преобразует простые запросы в json формат по типу 
+
+    {
+      "action": "count_videos",
+      "filters": {
+          "creator_id": "uuid OPTIONAL",
+          "created_from": "YYYY-MM-DD OPTIONAL",
+          ...
+      }
+    }
+или
+
+    {
+      "action": "count_snapshot_events",
+      "metric": "views" | "likes" | "comments" | "reports",
+      "date": "YYYY-MM-DD"
+    }
+    
+и т.п.
+
+Здесь строго задан тип действия, и параметры, которые в последствии строго и однозначно преобразуются в SQL в файле [db/queries](https://github.com/smbd0x/rlt_tt/blob/master/db/queries.py).
+
+В случае сложных и нестандартных запросов LLM пишет "кастомный" запрос на SQL и отдает в виде:
+
+    {
+      "action": "custom_sql",
+      "sql": "<SQL-запрос с параметрами :param>",
+      "params": {"param1": "значение1", ...}
+    }

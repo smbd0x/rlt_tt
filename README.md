@@ -43,4 +43,4 @@
 
 
 ## О боте ##
-Промпт можно найти в файле [llm/parser](llm/parser)
+Промпт можно найти в файле [llm/parser](https://github.com/smbd0x/rlt_tt/blob/master/llm/parser.py)

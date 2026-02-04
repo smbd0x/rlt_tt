@@ -5,7 +5,7 @@ from db.base import SessionLocal
 
 async def run_query(command: dict) -> int:
     action = command.get("action")
-    print(f'Поступила новая команда: {command}')
+    print(f"Поступила новая команда: {command}")
 
     if action == "count_videos":
         return await count_videos(command.get("filters"))
@@ -16,6 +16,9 @@ async def run_query(command: dict) -> int:
     if action == "count_snapshot_events":
         return await count_snapshot_events(command["metric"], command["date"])
 
+    if action == "custom_sql":
+        return await run_custom_sql(command["sql"], command.get("params", {}))
+
     raise ValueError("Unknown action")
 
 
@@ -25,21 +28,18 @@ async def count_videos(filters: dict | None) -> int:
         params = {}
 
         if filters:
-            # creator_id
             if creator := filters.get("creator_id"):
                 base += " AND creator_id = :creator_id"
                 params["creator_id"] = creator
 
-            # date range
             if c_from := filters.get("created_from"):
+                params["created_from"] = parser.parse(c_from)
                 base += " AND video_created_at >= :created_from"
-                params["created_from"] = parser.parse(c_from).date()
 
             if c_to := filters.get("created_to"):
+                params["created_to"] = parser.parse(c_to)
                 base += " AND video_created_at <= :created_to"
-                params["created_to"] = parser.parse(c_to).date()
 
-            # numeric filters
             if views_gt := filters.get("views_gt"):
                 base += " AND views_count > :views_gt"
                 params["views_gt"] = views_gt
@@ -84,3 +84,16 @@ async def count_snapshot_events(metric: str, date: str) -> int:
         date_obj = parser.parse(date).date()
         result = await session.execute(text(sql), {"date": date_obj})
         return result.scalar_one()
+
+
+async def run_custom_sql(sql: str, params: dict) -> int:
+        for key, value in params.items():
+            if isinstance(value, str):
+                try:
+                    params[key] = parser.parse(value)
+                except Exception:
+                    pass
+
+        async with SessionLocal() as session:
+            result = await session.execute(text(sql), params)
+            return result.scalar_one()

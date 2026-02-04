@@ -2,7 +2,7 @@ import json
 from dateutil import parser
 
 from config import Config
-from db.base import SessionLocal
+from db.base import SessionLocal, init_db
 from db.models import Video, VideoSnapshot
 
 DATABASE_URL = Config.DATABASE_URL
@@ -17,6 +17,8 @@ def parse_dt(dt_str: str):
 
 
 async def import_json():
+
+    await init_db()
 
     with open(JSON_FILE, "r", encoding="utf8") as f:
         data = json.load(f)

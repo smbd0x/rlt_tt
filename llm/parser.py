@@ -113,6 +113,8 @@ PROMPT = """
 - если "сколько видео получили просмотры" → count_snapshot_events
 - Для запроса «сколько разных календарных дней…» LLM должен писать COUNT(DISTINCT DATE(...))
 - если запрос нестандартный, возвращать custom_sql с безопасным SQL
+- Никогда не использовать MySQL-функции типа HOUR(), DATE() и т.п.
+- Использовать только синтаксис PostgreSQL
 
 ============================================================
 ПРИМЕРЫ
@@ -167,6 +169,7 @@ PROMPT = """
 
 
 async def parse_text_to_command(text: str) -> dict:
+    print(f'Поступил запрос к LLM: "{text}"')
     response = await client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
@@ -175,4 +178,6 @@ async def parse_text_to_command(text: str) -> dict:
         ]
     )
     content = response.choices[0].message.content
-    return json.loads(content)
+    res = json.loads(content)
+    print(f'Получен ответ на запрос "{text}": {res}')
+    return res

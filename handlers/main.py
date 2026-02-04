@@ -20,6 +20,7 @@ async def message_handler(message: Message):
     try:
         command = await parse_text_to_command(user_text)
         result = await run_query(command)
+        print(f"Получен результат для команды {command}: {result}")
         await message.answer(str(result))
 
     except Exception as e:

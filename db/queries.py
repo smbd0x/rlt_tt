@@ -91,8 +91,8 @@ async def run_custom_sql(sql: str, params: dict) -> int:
             if isinstance(value, str):
                 try:
                     params[key] = parser.parse(value)
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(e)
 
         async with SessionLocal() as session:
             result = await session.execute(text(sql), params)
